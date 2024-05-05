@@ -121,7 +121,7 @@ impl Drop for LRUCache {
       let map = std::mem::take(&mut self.map);
       for (_, v) in map {
         unsafe {
-          let _ = Box::from_raw(v);
+          v.drop_in_place()
         }
       }
     }
