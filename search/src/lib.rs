@@ -35,24 +35,25 @@ impl<T> Coll<T> for VecDeque<T> {
 trait Frontier<S, A, C> where
     S: PartialEq,
     C:Coll<Rc<Node<S, A>>> + IntoIterator<Item = Rc<Node<S, A>>>,
-    for<'a> &'a mut C: IntoIterator<Item = Rc<Node<S, A>>> {
+    for<'a> &'a mut C: IntoIterator<Item = &'a mut Rc<Node<S, A>>>,
+    for<'a> &'a C: IntoIterator<Item = &'a Rc<Node<S, A>>> {
   // type S: PartialEq;
   // type A;
   // type C: Coll<Rc<Node<Self::S, Self::A>>> + IntoIterator<Item = Rc<Node<Self::S, Self::A>>> where for<'a> &'a Self::C: IntoIterator<Item = Rc<Node<Self::S, Self::A>>>;
 
-  fn collection(&self) -> &mut C;
+  fn collection_mut(&mut self) -> &mut C;
+  fn collection(&self) -> &C;
 
   fn add(&mut self, node: Rc<Node<S, A>>) {
-    self.collection().add(node.clone())
+    self.collection_mut().add(node.clone())
   }
 
   fn remove(&mut self) -> Option<Rc<Node<S, A>>> {
-    self.collection().remove()
+    self.collection_mut().remove()
   }
 
   fn contains(&self, state: S) -> bool {
-    let q = self.collection();
-    for node in q.into_iter() {
+    for node in self.collection().into_iter() {
       if node.state.as_ref().eq(&state) {
         return true
       }
@@ -61,17 +62,19 @@ trait Frontier<S, A, C> where
   }
 }
 
-// struct StackFrontier<S, A> where S:PartialEq {
-//   collection: Vec<Rc<Node<S, A>>>
-// }
+struct StackFrontier<S, A> where S:PartialEq {
+  collection: Vec<Rc<Node<S, A>>>
+}
 
-// impl<S, A> Frontier<S, A> for StackFrontier<S, A> where S:PartialEq {
-//     type C=VecDeque<Rc<Node<S, A>>>;
+impl<S, A> Frontier<S, A, Vec<Rc<Node<S, A>>>> for StackFrontier<S, A> where S:PartialEq {
+    fn collection_mut(&mut self) -> &mut Vec<Rc<Node<S, A>>> {
+        &mut self.collection
+    }
 
-//     fn collection(&self) -> Self::C {
-//         self.collection
-//     }
-// }
+    fn collection(&self) -> &Vec<Rc<Node<S, A>>> {
+        &self.collection
+    }
+}
 
 
 #[cfg(test)]
@@ -80,7 +83,9 @@ mod tests {
 
     #[test]
     fn it_works() {
-        // let result = add(2, 2);
-        // assert_eq!(result, 4);
+      let v = vec![1, 2, 3];
+      for vv in &v {
+        print!("{}", vv)
+      }
     }
 }
