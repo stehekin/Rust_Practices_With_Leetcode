@@ -37,9 +37,6 @@ trait Frontier<S, A, C> where
     C:Coll<Rc<Node<S, A>>> + IntoIterator<Item = Rc<Node<S, A>>>,
     for<'a> &'a mut C: IntoIterator<Item = &'a mut Rc<Node<S, A>>>,
     for<'a> &'a C: IntoIterator<Item = &'a Rc<Node<S, A>>> {
-  // type S: PartialEq;
-  // type A;
-  // type C: Coll<Rc<Node<Self::S, Self::A>>> + IntoIterator<Item = Rc<Node<Self::S, Self::A>>> where for<'a> &'a Self::C: IntoIterator<Item = Rc<Node<Self::S, Self::A>>>;
 
   fn collection_mut(&mut self) -> &mut C;
   fn collection(&self) -> &C;
@@ -72,6 +69,20 @@ impl<S, A> Frontier<S, A, Vec<Rc<Node<S, A>>>> for StackFrontier<S, A> where S:P
     }
 
     fn collection(&self) -> &Vec<Rc<Node<S, A>>> {
+        &self.collection
+    }
+}
+
+struct QueueFrontier<S, A> where S:PartialEq {
+  collection: VecDeque<Rc<Node<S, A>>>
+}
+
+impl<S, A> Frontier<S, A, VecDeque<Rc<Node<S, A>>>> for QueueFrontier<S, A> where S:PartialEq {
+    fn collection_mut(&mut self) -> &mut VecDeque<Rc<Node<S, A>>> {
+        &mut self.collection
+    }
+
+    fn collection(&self) -> &VecDeque<Rc<Node<S, A>>> {
         &self.collection
     }
 }
