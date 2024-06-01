@@ -86,17 +86,3 @@ impl<S, A> Frontier<S, A, VecDeque<Rc<Node<S, A>>>> for QueueFrontier<S, A> wher
         &self.collection
     }
 }
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-      let v = vec![1, 2, 3];
-      for vv in &v {
-        print!("{}", vv)
-      }
-    }
-}
